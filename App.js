@@ -7,8 +7,10 @@ import SignupScreen from "./screens/SignupScreen";
 import WelcomeScreen from "./screens/WelcomeScreen";
 import { Colors } from "./constants/styles";
 import AuthContextProvider, { AuthContext } from "./store/auth-context";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import IconButton from "./components/ui/IconButton";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SplashScreen from "expo-splash-screen";
 
 const Stack = createNativeStackNavigator();
 
@@ -56,6 +58,31 @@ function AuthenticatedStack() {
   );
 }
 
+SplashScreen.preventAutoHideAsync;
+// NOTE to get the context we can create a root function to get wrapped
+function Root() {
+  const [isTryingLogin, setIsTryingLogin] = useState(true);
+  const authCtx = useContext(AuthContext);
+
+  // moved the useEffect to root to avoid the flickering of loging screen before the welcome screen is shown
+  // NOTE react says don't use useEffect(async () => {}) so run it like this instead
+  useEffect(() => {
+    async function fetchToken() {
+      const storedToken = await AsyncStorage.getItem("token");
+
+      if (storedToken) {
+        authCtx.authenticate(storedToken);
+      }
+      setIsTryingLogin(false);
+    }
+    fetchToken();
+  }, []);
+  if (!isTryingLogin) {
+    SplashScreen.hideAsync();
+  }
+  return <Navigation />;
+}
+
 function Navigation() {
   const authCtx = useContext(AuthContext);
   return (
@@ -71,7 +98,7 @@ export default function App() {
     <>
       <StatusBar style="light" />
       <AuthContextProvider>
-        <Navigation />
+        <Root />
       </AuthContextProvider>
     </>
   );
