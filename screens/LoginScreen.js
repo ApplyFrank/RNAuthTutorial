@@ -1,3 +1,4 @@
+import { Alert } from "react-native";
 import AuthContent from "../components/Auth/AuthContent";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
 import { login } from "../util/auth";
@@ -12,6 +13,10 @@ function LoginScreen() {
       await login(email, password);
     } catch (error) {
       console.log("login error: ", error);
+      Alert.alert(
+        "Authentication failed!",
+        "Could not log you in check email or password"
+      );
     }
 
     setIsAuthenticating(false);
