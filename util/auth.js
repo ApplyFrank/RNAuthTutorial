@@ -2,7 +2,7 @@ import axios from "axios";
 
 const API_KEY = "AIzaSyABzrW1PzwCym02rsHvMXrJmTo1pzA25cQ";
 export function createUser(email, password) {
-  return authenticate("signup", email, password);
+  return authenticate("signUp", email, password);
 }
 // NOTE if you return token in authenticate since its already handling the promise,
 // you can remove async await from login and createUser
